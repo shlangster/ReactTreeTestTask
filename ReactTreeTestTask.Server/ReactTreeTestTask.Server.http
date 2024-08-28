@@ -1,0 +1,6 @@
+@ReactTreeTestTask.Server_HostAddress = http://localhost:5124
+
+GET {{ReactTreeTestTask.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
