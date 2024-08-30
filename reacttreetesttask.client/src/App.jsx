@@ -1,49 +1,61 @@
 import { useEffect, useState } from 'react';
+import Tree from './Tree'
+import Popup from './Popup';
+import ErrorMessage from './ErrorMessage';
 import './App.css';
 
 function App() {
-    const [forecasts, setForecasts] = useState();
+    const [trees, setTrees] = useState([]);
+    const [error, setError] = useState("");
+    const [popupVisible, setPopupVisible] = useState(false);
+    const [treeName, setTreeName] = useState("");
 
     useEffect(() => {
-        populateWeatherData();
+        populateTrees();
     }, []);
 
-    const contents = forecasts === undefined
-        ? <p><em>Loading... Please refresh once the ASP.NET backend has started. See <a href="https://aka.ms/jspsintegrationreact">https://aka.ms/jspsintegrationreact</a> for more details.</em></p>
-        : <table className="table table-striped" aria-labelledby="tableLabel">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Temp. (C)</th>
-                    <th>Temp. (F)</th>
-                    <th>Summary</th>
-                </tr>
-            </thead>
-            <tbody>
-                {forecasts.map(forecast =>
-                    <tr key={forecast.date}>
-                        <td>{forecast.date}</td>
-                        <td>{forecast.temperatureC}</td>
-                        <td>{forecast.temperatureF}</td>
-                        <td>{forecast.summary}</td>
-                    </tr>
-                )}
-            </tbody>
-        </table>;
+    const populateTrees = async () => {
+        const response = await fetch('api.user.tree.list', { method: "POST" });
+        const data = await response.json();
+        if (response.ok) {
+            setTrees([...data.map(_ => _.name)]);
+        }
+        else {
+            setError(data.data.message);
+        }
+    }
+
+    const addTree = async () => {
+        const response = await fetch(`api.user.tree.get?treeName=${treeName}`, { method: "POST" });
+        if (response.ok) {
+            setTreeName("");
+            setPopupVisible(false);
+            await populateTrees();
+        }
+        else {
+            const data = await response.json();
+            setError(data.data.message);
+        }
+    }
+
+
 
     return (
         <div>
-            <h1 id="tableLabel">Weather forecast</h1>
-            <p>This component demonstrates fetching data from the server.</p>
-            {contents}
+            {error && <ErrorMessage message={error} onClose={() => setError()} />}
+        
+            <div>
+                <h1 id="tableLabel">Tree</h1><button onClick={() => setPopupVisible(true)}>Add New Tree</button><br /><br />
+                {popupVisible &&
+                    <Popup title="Add Tree" handleClose={() => setPopupVisible(false)} handleSubmit={() => addTree()} >
+                        <label htmlFor="treename">Tree name:</label>&nbsp;
+                        <input type="text" name="treename" id="treename" required value={treeName} onChange={e => setTreeName(e.target.value)} />
+                    </Popup>
+                }
+                {trees.map(tree => { return (<Tree treeName={tree} reload={populateTrees} key={tree} onError={e => setError(e)} />) })}
+            </div>
         </div>
     );
-    
-    async function populateWeatherData() {
-        const response = await fetch('weatherforecast');
-        const data = await response.json();
-        setForecasts(data);
-    }
 }
 
 export default App;

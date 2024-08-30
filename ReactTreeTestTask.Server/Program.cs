@@ -33,6 +33,11 @@ namespace ReactTreeTestTask.Server
                 context.Request.EnableBuffering();
                 await next();
             });
+            using (var Scope = app.Services.CreateScope())
+            {
+                var context = Scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                context.Database.Migrate();
+            }
             app.UseExceptionHandler();
 
             app.UseDefaultFiles();

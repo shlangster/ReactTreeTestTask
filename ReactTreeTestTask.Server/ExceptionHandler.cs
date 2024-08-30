@@ -7,7 +7,6 @@ namespace ReactTreeTestTask.Server
     class ExceptionHandler : IExceptionHandler
     {
         private readonly ILogger<ExceptionHandler> _logger;
-        private readonly IServiceProvider _sp;
 
         public ExceptionHandler(ILogger<ExceptionHandler> logger)
         {

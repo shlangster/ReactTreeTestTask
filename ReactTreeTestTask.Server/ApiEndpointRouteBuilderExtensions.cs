@@ -22,7 +22,16 @@ namespace ReactTreeTestTask.Server
             }).WithDescription("Returns your entire tree. If your tree doesn't exist it will be created automatically.")
             .WithTags("user.tree")
             .WithOpenApi();
-            
+
+            endpoints.MapPost("/api.user.tree.list", async Task<Results<Ok<List<NodeDto>>, ProblemHttpResult>>
+                ([FromServices] IServiceProvider sp) =>
+            {
+                var treeService = sp.GetRequiredService<ITreeService>();
+                return TypedResults.Ok<List<NodeDto>>(treeService.GetTreeList());
+            }).WithDescription("Returns your entire tree. If your tree doesn't exist it will be created automatically.")
+            .WithTags("user.tree")
+            .WithOpenApi();
+
 
             endpoints.MapPost("/api.user.tree.node.create", async Task<Results<Ok, ProblemHttpResult>>
                 ([FromQuery] string treeName, [FromQuery] int parentNodeId, [FromQuery] string nodeName, [FromServices] IServiceProvider sp) =>

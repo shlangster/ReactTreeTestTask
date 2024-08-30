@@ -31,20 +31,34 @@ namespace ReactTreeTestTask.Server.Services
             return new NodeDto(root);
         }
 
+        public List<NodeDto> GetTreeList()
+        {
+            var list = _dbContext.Nodes.Where(_ => _.ParentId == null).OrderBy(_ => _.Id).ToList().Select( _ => new NodeDto(_));
+            return list.ToList();
+        }
+
         public async Task CreateNode(string treeName, int parentNodeId, string nodeName)
         {
             var root = _dbContext.Nodes.FirstOrDefault(_ => _.Name == treeName && _.ParentId == null);
             if (root == null)
                 throw new SecureException($"Tree with Name = {treeName} was not found");
-            
-            var parentNode = _dbContext.Nodes.FirstOrDefault(_ => _.ParentId != null && _.Id == parentNodeId);
-            if (parentNode == null)
-                throw new SecureException($"Node with ID = {parentNodeId} was not found");
-            
 
-            var fullTree = await _dbContext.SelectFullTree(root.Id);
-            if (!fullTree.Any(_ => _.Id == parentNode.Id))
-                throw new SecureException("Requested node was found, but it doesn't belong your tree");
+            Node parentNode;
+            if (root.Id == parentNodeId)
+            {
+                parentNode = root;
+            }
+            else
+            {
+                parentNode = _dbContext.Nodes.FirstOrDefault(_ => _.ParentId != null && _.Id == parentNodeId);
+                if (parentNode == null)
+                    throw new SecureException($"Node with ID = {parentNodeId} was not found");
+
+
+                var fullTree = await _dbContext.SelectFullTree(root.Id);
+                if (!fullTree.Any(_ => _.Id == parentNode.Id))
+                    throw new SecureException("Requested node was found, but it doesn't belong your tree");
+            }
             
             var newNode = new Node()
             {
@@ -83,10 +97,14 @@ namespace ReactTreeTestTask.Server.Services
             var root = _dbContext.Nodes.FirstOrDefault(_ => _.Name == treeName && _.ParentId == null);
             if (root == null)
                 throw new SecureException($"Tree with Name = {treeName} was not found");
-            
+
+            if (root.Id == nodeId && _dbContext.Nodes.Any(_ => _.Name == newNodeName && _.ParentId == null && _.Id != nodeId))
+                throw new SecureException($"Tree with Name = {newNodeName} already exists");
+
             var node = _dbContext.Nodes.FirstOrDefault(_ => _.Id == nodeId);
             if (node == null)
                 throw new SecureException($"Node with ID = {nodeId} was not found");
+            
             
             var fullTree = await _dbContext.SelectFullTree(root.Id);
             if (!fullTree.Any(_ => _.Id == node.Id))

@@ -3,9 +3,50 @@
     margin: 0 auto;
     padding: 2rem;
     text-align: center;
+    width: 100%;
 }
 
 th, td {
     padding-left: 1rem;
     padding-right: 1rem;
 }
+
+img.nodeIcon {}
+
+img.nodeIconExpanded {
+    transform: rotate(-90deg);
+}
+
+div.node {
+    overflow: auto;
+}
+
+div.node_head {
+    width: 100%;
+    overflow: auto;
+    margin-bottom: 5px;
+}
+
+div.icon {
+    float: left;
+    overflow: auto;
+    width: 30px;
+    height: 30px;
+}
+
+div.node_name {
+    float: left;
+    overflow: auto;
+}
+
+div.buttons {
+    float: left;
+    overflow: auto;
+}
+
+    div.buttons button {
+        font-weight: bold;
+        line-height: 20px;
+        padding: 5px;
+        margin-left: 5px;
+    }

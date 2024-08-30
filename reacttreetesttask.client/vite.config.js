@@ -41,9 +41,26 @@ export default defineConfig({
             '@': fileURLToPath(new URL('./src', import.meta.url))
         }
     },
+
     server: {
         proxy: {
-            '^/weatherforecast': {
+            '^/api.user.tree.get': {
+                target,
+                secure: false
+            },
+            '^/api.user.tree.node.create': {
+                target,
+                secure: false
+            },
+            '^/api.user.tree.node.delete': {
+                target,
+                secure: false
+            },
+            '^/api.user.tree.node.rename': {
+                target,
+                secure: false
+            },
+            '^/api.user.tree.list': {
                 target,
                 secure: false
             }

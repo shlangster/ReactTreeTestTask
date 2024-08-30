@@ -13,7 +13,7 @@ namespace ReactTreeTestTask.Server
         public Task<List<Node>> SelectFullTree(int id) =>
             Nodes.FromSqlRaw(
                 "WITH RECURSIVE tree AS (" +
-                "SELECT \"Id\", \"Name\", \"ParentId\" FROM public.\"Nodes\" WHERE \"ParentId\" IS NULL  " +
+                "SELECT \"Id\", \"Name\", \"ParentId\" FROM public.\"Nodes\" WHERE \"ParentId\" IS NULL AND \"Id\" = {0} " +
                 "UNION ALL        " +
                 "SELECT n.\"Id\", n.\"Name\", n.\"ParentId\" FROM \"Nodes\" n INNER JOIN tree t ON t.\"Id\" = n.\"ParentId\")" +
                 "SELECT * FROM tree", id)
